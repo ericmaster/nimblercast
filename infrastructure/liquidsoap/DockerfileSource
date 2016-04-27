@@ -1,0 +1,40 @@
+FROM debian:jessie
+
+MAINTAINER Eric Aguayo ericmaster@nimblersoft.com
+
+RUN apt-get -q update && \
+    apt-get install -y apt-utils && \
+    apt-get install -y ocaml-findlib libcamomile-ocaml-dev && \
+    apt-get install -y libmad0-dev libshout3-dev libvorbis-dev libid3tag0-dev libpcre3-dev && \
+    apt-get install -y libasound2-dev autoconf automake && \
+    apt-get install -y build-essential && \
+    apt-get install -y opam && \
+    apt-get install -y bzip2 && \
+    apt-get clean
+
+RUN adduser --disabled-password --gecos "" liquidsoap
+
+WORKDIR /home/liquidsoap
+
+ADD https://github.com/savonet/liquidsoap/releases/download/1.2.0/liquidsoap-1.2.0-full.tar.bz2 .
+
+RUN chown -R liquidsoap:liquidsoap liquidsoap* 
+
+USER liquidsoap
+
+RUN opam init -y && opam config setup -a && eval `opam config env` && \
+    opam install base-bytes -y && \
+    opam install liquidsoap -y
+
+RUN ls -la
+
+RUN tar jxf liquidsoap-1.2.0-full.tar.bz2
+
+COPY PACKAGES liquidsoap-1.2.0-full/.
+
+RUN cd liquidsoap-1.2.0-full && \
+    ./bootstrap && ./configure && ./configure && \
+    make && make install
+
+CMD ["liquidsoap", "-h"]
+
