@@ -16,3 +16,17 @@ liquidsoap:
    - ../../logs:/var/log
   links:
    - icecast
+web:
+  container_name: web
+  #hostname: web
+  build: web/.
+  net: "host"
+  privileged: true
+  ports:
+   - "8008:80"
+  volumes:
+   - ../../conf/nginx/sites-enabled:/etc/nginx/sites-enabled
+   - ../../logs:/var/log
+   - ../../www/docroot:/var/www/html
+   - ../../private-files:/var/www/_private
+   - /tmp:/tmp
